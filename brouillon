@@ -1,0 +1,1 @@
+sql = SELECT cr_identifiant, cr_mot_de_passe FROM credentials WHERE login = :login AND mdp = :mdp

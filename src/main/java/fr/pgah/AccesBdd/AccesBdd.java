@@ -2,6 +2,7 @@ package fr.pgah.AccesBdd;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -80,5 +81,45 @@ public class AccesBdd {
     // Finalement on renvoie à l'appelant la liste de visiteurs construite
     Logger.log("Récupération visiteurs OK");
     return visiteurs;
+  }
+  /*
+   * public static test() {
+   * Connection conn = getConnection();
+   * // On sort immédiatement si la connexion a échoué
+   * if (conn == null) {
+   * return null;
+   * }
+   * 
+   * String sql =
+   * "SELECT cr_identifiant, cr_mot_de_passe FROM credentials WHERE cr_identifiant = :id_login AND cr_mot_de_passe = :id_password"
+   * ;
+   * 
+   * }
+   * 
+   */
+
+  public static boolean verifierIdentifiants(String identifiant, String motDePasse) {
+    Connection conn = getConnection();
+    if (conn == null) {
+      return false;
+    }
+
+    try {
+      String sql = "SELECT COUNT(*) AS count FROM credentials WHERE cr_identifiant = ? AND cr_mot_de_passe = ?";
+      PreparedStatement requete = conn.prepareStatement(sql);
+      requete.setString(1, identifiant);
+      requete.setString(2, motDePasse);
+      ResultSet res = requete.executeQuery();
+
+      if (res.next()) {
+        int count = res.getInt("count");
+
+        return count > 0;
+      }
+    } catch (SQLException ex) {
+      Logger.log("Erreur lors de la vérification des identifiants.");
+      Logger.log(ex.getMessage());
+    }
+    return false;
   }
 }
